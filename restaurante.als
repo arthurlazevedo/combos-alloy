@@ -1,3 +1,5 @@
+// -=-=-=-=-=- Assinaturas -=-=-=-=-=-
+
 abstract sig Combo {
     pratos: some Prato
 }
@@ -13,42 +15,42 @@ some sig Entrada extends Prato {}
 some sig Principal extends Prato {}
 some sig Sobremesa extends Prato {}
 
-fact {
-    // -=-=-=-=-=- Fatos gerais para Combos -=-=-=-=-=-
+// -=-=-=-=-=- Fatos -=-=-=-=-=-
 
+fact Combos {
     -- Garante que o Combo tem no máximo uma sobremesa.
     all c: Combo | lone s: Sobremesa | contem_prato[c, s]
+    // mesa in Conjunto some -> one Reserva
 
     -- Assegura que o Combo possui pelo menos um prato principal.
     all c: Combo | some p: Principal | contem_prato[c, p]
 
     -- Restringe que combos com os mesmos pratos são os mesmos combos.
-    all c1, c2: Combo | c1.pratos = c2.pratos iff c1 = c2
+    all disj c1, c2: Combo | c1.pratos = c2.pratos implies c1 = c2
+}
 
-
-    // -=-=-=-=-=- Fatos para Combos Comuns -=-=-=-=-=-
-
+fact CombosComuns {
     -- Garante que os combos comuns não terão todos os tipos de pratos (características dos combos especiais).
     all c: Comum | no (c.pratos & Entrada) or no (c.pratos & Sobremesa)
+}
 
-
-    // -=-=-=-=-=- Fatos para Combos Especiais -=-=-=-=-=-
-
+fact CombosEspeciais {
     -- Combos especiais devem ter pelo menos uma entrada e exatamente uma sobremesa (combina com a restrição geral).
     all c: Especial | (some e: Entrada | contem_prato[c, e]) and (one s: Sobremesa | contem_prato[c, s])
+}
 
-
-    // -=-=-=-=-=- Fatos para Pratos -=-=-=-=-=-
-
+fact Pratos {
     -- Pratos não podem ser incompatíveis com si próprios.
     all p1, p2: Prato | incompativeis[p1, p2] implies p1 != p2
 
     -- Garante que a relação de incompatibilidade é bidirecional.
-    all p1, p2: Prato | incompativeis[p1, p2] iff incompativeis[p2, p1]
+    all disj p1, p2: Prato | incompativeis[p1, p2] iff incompativeis[p2, p1]
 
     -- Não permite que pratos incompatíveis estejam no mesmo combo.
-    all p1, p2: Prato | all c: Combo | (incompativeis[p1, p2] and contem_prato[c, p1]) implies not contem_prato[c, p2]
+    all disj p1, p2: Prato, c: Combo | (incompativeis[p1, p2] and contem_prato[c, p1]) implies not contem_prato[c, p2]
 }
+
+// -=-=-=-=-=- Predicados -=-=-=-=-=-
 
 pred contem_prato[c: Combo, p: Prato] {
     p in c.pratos
@@ -58,18 +60,33 @@ pred incompativeis[x: Prato, y: Prato] {
     x in y.incompativeis
 }
 
-run exemplo {} for 3
+// -=-=-=-=-=- Asserts -=-=-=-=-=-
 
-assert voce_nao_eh_especial {
-    all c:Comum | (no e:Entrada | contem_prato[c, e]) or (no s:Sobremesa | contem_prato[c, s])
+assert prato_compativel_com_si_proprio {
+    all p: Prato | not incompativeis[p, p]
 }
 
-assert prato_daora {
-    no p: Prato | p.incompativeis = (Prato - p)
+assert pratos_incompativeis_separados {
+    all c: Combo | all disj p1, p2: c.pratos | not incompativeis[p1, p2]
 }
 
-assert especial_merda {
+assert especial_tem_todos_pratos {
     no e:Especial | #e.pratos < 3
+        and no (e.pratos & Entrada)
+        and no (e.pratos & Principal)
+        and no (e.pratos & Sobremesa)
 }
 
-check especial_merda for 10
+assert comum_nao_eh_especial {
+    all c:Comum | no (c.pratos & Entrada)
+        or no (c.pratos & Principal)
+        or no (c.pratos & Sobremesa)
+}
+
+// -=-=-=-=-=- Executaveis -=-=-=-=-=-
+
+check prato_compativel_com_si_proprio for 5
+check pratos_incompativeis_separados for 5
+check especial_tem_todos_pratos for 5
+check comum_nao_eh_especial for 5
+run exemplo {} for 5
