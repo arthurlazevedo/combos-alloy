@@ -20,7 +20,6 @@ some sig Sobremesa extends Prato {}
 fact Combos {
     -- Garante que o Combo tem no máximo uma sobremesa.
     all c: Combo | lone s: Sobremesa | contem_prato[c, s]
-    // mesa in Conjunto some -> one Reserva
 
     -- Assegura que o Combo possui pelo menos um prato principal.
     all c: Combo | some p: Principal | contem_prato[c, p]
@@ -71,10 +70,10 @@ assert pratos_incompativeis_separados {
 }
 
 assert especial_tem_todos_pratos {
-    no e:Especial | #e.pratos < 3
-        and no (e.pratos & Entrada)
-        and no (e.pratos & Principal)
-        and no (e.pratos & Sobremesa)
+    all e:Especial | #e.pratos >= 3
+        and some (e.pratos & Entrada)
+        and some (e.pratos & Principal)
+        and some (e.pratos & Sobremesa)
 }
 
 assert comum_nao_eh_especial {
