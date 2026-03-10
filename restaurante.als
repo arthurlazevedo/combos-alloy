@@ -69,23 +69,32 @@ assert pratos_incompativeis_separados {
     all c: Combo | all disj p1, p2: c.pratos | not incompativeis[p1, p2]
 }
 
+assert algum_dos_pratos_eh_diferente {
+    all disj c1, c2: Combo | c1.pratos != c2.pratos
+}
+
+assert comum_tem_pratos_necessarios {
+    all c: Comum | some (c.pratos & Principal) and lone (c.pratos & Sobremesa)
+}
+
 assert especial_tem_todos_pratos {
-    all e:Especial | #e.pratos >= 3
+    all e: Especial | #e.pratos >= 3
         and some (e.pratos & Entrada)
         and some (e.pratos & Principal)
         and some (e.pratos & Sobremesa)
 }
 
 assert comum_nao_eh_especial {
-    all c:Comum | no (c.pratos & Entrada)
+    all c: Comum | no (c.pratos & Entrada)
         or no (c.pratos & Principal)
         or no (c.pratos & Sobremesa)
 }
 
 // -=-=-=-=-=- Executaveis -=-=-=-=-=-
-
 check prato_compativel_com_si_proprio for 5
 check pratos_incompativeis_separados for 5
+check algum_dos_pratos_eh_diferente for 5
+check comum_tem_pratos_necessarios for 5
 check especial_tem_todos_pratos for 5
 check comum_nao_eh_especial for 5
 run exemplo {} for 5
