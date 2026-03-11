@@ -62,6 +62,11 @@ pred incompativeis[x: Prato, y: Prato] {
 // -=-=-=-=-=- Asserts -=-=-=-=-=-
 
 -- assert falso, deve falhar
+assert prato_nao_tem_mais_de_um_incompativel {
+    all p: Prato | #p.incompativeis < 2
+}
+
+-- assert falso, deve falhar
 assert prato_sempre_tem_incompativel {
     no p: Prato | #p.incompativeis = 0
 }
@@ -104,6 +109,7 @@ assert comum_nao_eh_especial {
 }
 
 // -=-=-=-=-=- Executaveis -=-=-=-=-=-
+check prato_nao_tem_mais_de_um_incompativel for 5 -- deve achar um contraexemplo
 check prato_sempre_tem_incompativel for 5 -- deve achar um contraexemplo
 
 
