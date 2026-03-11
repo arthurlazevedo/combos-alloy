@@ -61,8 +61,17 @@ pred incompativeis[x: Prato, y: Prato] {
 
 // -=-=-=-=-=- Asserts -=-=-=-=-=-
 
+-- assert falso, deve falhar
+assert prato_sempre_tem_incompativel {
+    no p: Prato | #p.incompativeis = 0
+}
+
 assert prato_compativel_com_si_proprio {
     all p: Prato | not incompativeis[p, p]
+}
+
+assert prato_incompativel_bidirecional {
+    all p1, p2: Prato | incompativeis[p1, p2] iff incompativeis[p2, p1]
 }
 
 assert pratos_incompativeis_separados {
@@ -75,6 +84,10 @@ assert algum_dos_pratos_eh_diferente {
 
 assert comum_tem_pratos_necessarios {
     all c: Comum | some (c.pratos & Principal) and lone (c.pratos & Sobremesa)
+}
+
+assert combo_tem_max_uma_sobremesa {
+    all c: Combo | lone (Sobremesa & c.pratos)
 }
 
 assert especial_tem_todos_pratos {
@@ -91,10 +104,15 @@ assert comum_nao_eh_especial {
 }
 
 // -=-=-=-=-=- Executaveis -=-=-=-=-=-
+check prato_sempre_tem_incompativel for 5 -- deve achar um contraexemplo
+
+
 check prato_compativel_com_si_proprio for 5
+check prato_incompativel_bidirecional for 5
 check pratos_incompativeis_separados for 5
 check algum_dos_pratos_eh_diferente for 5
 check comum_tem_pratos_necessarios for 5
+check combo_tem_max_uma_sobremesa for 5
 check especial_tem_todos_pratos for 5
 check comum_nao_eh_especial for 5
 run exemplo {} for 5
