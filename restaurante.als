@@ -109,6 +109,7 @@ assert comum_nao_eh_especial {
 }
 
 // -=-=-=-=-=- Executaveis -=-=-=-=-=-
+
 check prato_nao_tem_mais_de_um_incompativel for 5 -- deve achar um contraexemplo
 check prato_sempre_tem_incompativel for 5 -- deve achar um contraexemplo
 
